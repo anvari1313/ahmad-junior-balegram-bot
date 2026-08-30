@@ -1,0 +1,8 @@
+# Compiled binary
+/ahmad-junior-balegram-bot
+
+# JetBrains IDE
+.idea/
+
+# Environment
+.env
