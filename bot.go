@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -30,6 +31,8 @@ func main() {
 	if err := cfg.validate(); err != nil {
 		logger.Fatal("validate config", zap.Error(err))
 	}
+
+	fmt.Printf("%+v\n", cfg)
 
 	initLLM(cfg)
 
