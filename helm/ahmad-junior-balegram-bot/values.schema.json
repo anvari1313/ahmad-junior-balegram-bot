@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "config": {
+      "type": "object",
+      "properties": {
+        "telegramBotToken": { "$ref": "#/definitions/envVar" },
+        "telegramApiUrl": { "$ref": "#/definitions/envVar" },
+        "zaiApiKey": { "$ref": "#/definitions/envVar" },
+        "zaiBaseUrl": { "$ref": "#/definitions/envVar" },
+        "zaiModel": { "$ref": "#/definitions/envVar" }
+      }
+    }
+  },
+  "definitions": {
+    "envVar": {
+      "type": "object",
+      "oneOf": [
+        {
+          "description": "Literal inline value.",
+          "required": ["value"],
+          "properties": {
+            "value": { "type": "string", "minLength": 1 },
+            "secretRef": { "type": "object", "maxProperties": 0 }
+          }
+        },
+        {
+          "description": "Reference to a Kubernetes Secret key (name + key).",
+          "required": ["secretRef"],
+          "properties": {
+            "value": { "type": "string", "maxLength": 0 },
+            "secretRef": {
+              "type": "object",
+              "required": ["name", "key"],
+              "properties": {
+                "name": { "type": "string", "minLength": 1 },
+                "key": { "type": "string", "minLength": 1 }
+              }
+            }
+          }
+        },
+        {
+          "description": "Neither set: the application default applies.",
+          "properties": {
+            "value": { "type": "string", "maxLength": 0 },
+            "secretRef": { "type": "object", "maxProperties": 0 }
+          }
+        }
+      ]
+    }
+  }
+}

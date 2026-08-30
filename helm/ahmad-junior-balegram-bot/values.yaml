@@ -1,0 +1,143 @@
+# Default values for ahmad-junior-balegram-bot.
+#
+# Every application setting is injected via environment variables. Each
+# variable supports two mutually exclusive sources (a value XOR a secretRef):
+#
+#   config:
+#     telegramBotToken:
+#       value: "literal string"                  # inline value from values
+#       # secretRef:                             # OR reference to a Secret
+#       #   name: my-secret
+#       #   key: bot-token
+#
+# Exactly one of `value` / `secretRef` must be set per variable.
+
+# -- Override the fully-qualified image. Takes precedence over repository/tag.
+image:
+  # -- Image repository.
+  repository: ghcr.io/anvari1313/ahmad-junior-balegram-bot
+  # -- Image pull policy.
+  pullPolicy: IfNotPresent
+  # -- Image tag (defaults to chart `.Chart.AppVersion` when empty).
+  tag: ""
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+# -- Number of StatefulSet replicas. The bot is a singleton by design: more
+# than one replica would consume the same Telegram/Bale polling stream.
+replicaCount: 1
+
+serviceAccount:
+  # -- Whether to create a dedicated ServiceAccount for the StatefulSet.
+  create: true
+  # -- ServiceAccount name (defaults to the chart's full name).
+  name: ""
+  # -- Annotations for the ServiceAccount.
+  annotations: {}
+  # -- Automount API credentials into the pod.
+  automountServiceAccountToken: false
+
+# -- Annotations for the StatefulSet pod template.
+podAnnotations: {}
+# -- Labels for the StatefulSet pod template.
+podLabels: {}
+
+# -- Pod-level security context (runs as non-root UID 10001, matching the image).
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  fsGroup: 10001
+  seccompProfile:
+    type: RuntimeDefault
+
+# -- Container-level security context (hardened, matches the distroless-style image).
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+# -- Resource requests/limits for the bot container.
+resources: {}
+  # limits:
+  #   cpu: 200m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 50m
+  #   memory: 64Mi
+
+# -- Termination grace period for the bot pods.
+terminationGracePeriodSeconds: 30
+
+# -- Node selector for the StatefulSet pods.
+nodeSelector: {}
+
+# -- Affinity rules for the a StatefulSet pod; the default keeps exactly one
+# bot instance per node, a safety net if replicaCount is ever raised.
+affinity: {}
+  # podAntiAffinity:
+  #   requiredDuringSchedulingIgnoredDuringExecution:
+  #     - labelSelector:
+  #         matchLabels:
+  #           app.kubernetes.io/name: ahmad-junior-balegram-bot
+  #         matchExpressions:
+  #           - key: app.kubernetes.io/instance
+  #             operator: Exists
+  #       topologyKey: kubernetes.io/hostname
+
+# -- Taints the StatefulSet pods tolerate.
+tolerations: []
+
+# -- Priority class name for the StatefulSet pods.
+priorityClassName: ""
+
+# -- Extra volumes for the StatefulSet pod.
+volumes: []
+
+# -- Extra volume mounts for the bot container.
+volumeMounts: []
+
+# Application configuration passed to the container as environment variables.
+config:
+  telegramBotToken:
+    # -- Inline value for TELEGRAM_BOT_TOKEN. Mutually exclusive with secretRef.
+    value: ""
+    # -- Source TELEGRAM_BOT_TOKEN from a Kubernetes Secret.
+    secretRef: {}
+      # name: telegram-bot-secret
+      # key: token
+
+  telegramApiUrl:
+    # -- Inline value for TELEGRAM_API_URL. Defaults to https://tapi.bale.ai in
+    # the app when both value and secretRef are empty.
+    value: ""
+    secretRef: {}
+
+  zaiApiKey:
+    # -- Inline value for ZAI_API_KEY. Mutually exclusive with secretRef.
+    value: ""
+    secretRef: {}
+  zaiBaseUrl:
+    # -- Inline value for ZAI_BASE_URL. Defaults to https://api.z.ai/api/paas/v4/
+    # in the envDefault when both value and secretRef are empty.
+    value: ""
+    secretRef: {}
+
+  zaiModel:
+    # -- Inline ZAI_MODEL. Defaults to glm-5 in the app when both value and
+    # secretRef are empty.
+    value: ""
+    secretRef: {}
+
+# -- Additional environment variables from an existing ConfigMap or Secret
+# (keys become variable names). Applied after `config`; optional escape hatch.
+extraEnvFrom: []
+  # - secretRef:
+  #     name: my-extra-secret
+  # - configMapRef:
+  #     name: extra-config

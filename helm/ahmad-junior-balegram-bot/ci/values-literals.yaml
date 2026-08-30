@@ -1,0 +1,12 @@
+# All five variables as inline literal values.
+config:
+  telegramBotToken:
+    value: "1536633210:qz6J8HUJiLAScqELW4YQj7g86Apj1winV-w"
+  telegramApiUrl:
+    value: "https://tapi.bale.ai/"
+  zaiApiKey:
+    value: "sk-bf-e36d2832-aded-4800-a56e-307b69d43041"
+  zaiBaseUrl:
+    value: "https://ai.snapp.tech/v1"
+  zaiModel:
+    value: "glm-5"

@@ -1,0 +1,30 @@
+{{- define "bot.notes" -}}
+The Ahmad Junior Balegram bot has been installed as a StatefulSet.
+
+  Pod:        {{ include "bot.fullname" . }}-0
+  Replicas:   {{ .Values.replicaCount }}
+  Image:      {{ include "bot.image" . }}
+
+Check the pod:
+
+  kubectl -n {{ .Release.Namespace }} get pods -l app.kubernetes.io/instance={{ .Release.Name }}
+  kubectl -n {{ .Release.Namespace }} logs {{ include "bot.fullname" . }}-0
+
+{{- $missing := list -}}
+{{- if not (or .Values.config.telegramBotToken.value (and .Values.config.telegramBotToken.secretRef.name .Values.config.telegramBotToken.secretRef.key)) -}}
+{{- $missing = append $missing "TELEGRAM_BOT_TOKEN" -}}
+{{- end -}}
+{{- if not (or .Values.config.zaiApiKey.value (and .Values.config.zaiApiKey.secretRef.name .Values.config.zaiApiKey.secretRef.key)) -}}
+{{- $missing = append $missing "ZAI_API_KEY" -}}
+{{- end -}}
+{{- if $missing }}
+WARNING: the following required variables are not set in values; the pod will
+crash-loop until they are provided (inline `value` or `secretRef`):
+
+{{- range $missing }}
+  - {{ . }}
+{{- end }}
+{{- end }}
+{{- end -}}
+
+{{ include "bot.notes" . }}

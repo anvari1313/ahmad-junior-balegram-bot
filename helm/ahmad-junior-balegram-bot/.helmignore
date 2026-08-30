@@ -1,0 +1,3 @@
+# Patterns to skip when packaging the chart.
+ci/
+*.tgz
